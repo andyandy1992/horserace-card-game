@@ -15,7 +15,9 @@ Solution explained: [Quora](https://www.quora.com/What-are-the-odds-for-the-hors
 
 ## Example usage:
 To compute the odds for a race that shows 2 club cards, 2 diamond cards and 2 spade cards:
+
 ```python horserace_compute_odds.py 0 2 2 2```
 
 You can also simulate n races of the horserace card game for a given set of observed cards in the race track with (edit within file directly - currently set to run 1000 races that show 2 club cards, 2 diamond cards and 2 spade cards in the racetrack):
+
 ```python horserace_simulation.py```
