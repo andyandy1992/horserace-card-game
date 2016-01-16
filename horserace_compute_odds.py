@@ -78,7 +78,7 @@ if __name__ == "__main__":
     #Quick check: number of remaining cards at the start should be 42 (for usual setup)
     N = rH+rC+rD+rS # number of remainng cards at the start
     if N != 42:
-        print "Number of remainng cards at the start does not equal 42. Were the number of observed cards for each suit entered corerectly?"
+        print "Number of remaining cards at the start does not equal 42. Were the number of observed cards for each suit entered corerectly?"
         exit(1)
 
     #Compute winning probability for each suit
@@ -99,15 +99,15 @@ if __name__ == "__main__":
         print "ERROR: Probabilities didn't sum to 1. total_sum="+str(total_sum)
 
     #Compute horse odds (formula from https://www.google.co.uk/search?q=convert+probabilities+to+odds&oq=convert+probabilities+to+&gs_l=serp.3.0.0i22i30l10.80129.87682.0.88889.18.17.0.0.0.0.109.1340.16j1.17.0....0...1c.1.64.serp..9.9.731.TNXR5ahlXlk)
-    #oddsH = (1-pH)/pH
-    #oddsC = (1-pC)/pC
-    #oddsD = {1-pD}/pD
-    #oddsS = (1-pS)/pS
+#    oddsH = (1-pH)/pH
+#    oddsC = (1-pC)/pC
+#    oddsD = {1-pD}/pD
+#    oddsS = (1-pS)/pS
     pretty_oddsH = (1-pretty_pH)/pretty_pH
     pretty_oddsC = (1-pretty_pC)/pretty_pC
     pretty_oddsD = (1-pretty_pD)/pretty_pD
     pretty_oddsS = (1-pretty_pS)/pretty_pS
     
     print "Winnning odds (e.g. 3/1:='3 to 1 against'='stake 1 to win 3'):"
-    #print "Exact: H="+str(oddsH)+", C="+str(oddsC)+", D="+str(oddsD)+", S="+str(oddsS)
+#    print "Exact: H="+str(oddsH)+", C="+str(oddsC)+", D="+str(oddsD)+", S="+str(oddsS)
     print "H="+str(pretty_oddsH.numerator)+"/"+str(pretty_oddsH.denominator)+", C="+str(pretty_oddsC.numerator)+"/"+str(pretty_oddsC.denominator)+", D="+str(pretty_oddsD.numerator)+"/"+str(pretty_oddsD.denominator)+", S="+str(pretty_oddsS.numerator)+"/"+str(pretty_oddsS.denominator)
