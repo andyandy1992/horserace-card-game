@@ -11,7 +11,7 @@ Solution explained: [Quora](https://www.quora.com/What-are-the-odds-for-the-hors
 
 ##<a name="depends-on">Depends on:</a>
 - The Python Standard Library, https://docs.python.org/2/library/
-- Python versions 2.7+ (tested on Python 2.7.9 
+- Python versions 2.7 (tested on Python 2.7.11)
 
 ## Example usage:
 To compute the odds for a race that shows 2 club cards, 2 diamond cards and 2 spade cards:
