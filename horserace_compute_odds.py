@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-#LIBRARIES:
 # Standard library
 import math
 import sys
@@ -8,55 +7,61 @@ from decimal import *
 from fractions import Fraction
 
 
-def choose(n, x):
-    """ Compute 'n choose x' (i.e. the number of ways of choose r objects from a set of n
-    objects where order is unimportant='combination'). """
+def comb(n, r):
+    """ Return the combination of n and r (i.e. the number of ways for positioning r cards within a total of
+    n cards (where order doesn't matter). """
     f = math.factorial
-    return Decimal(f(n) / (f(x) * f(n-x)))
+    return f(n) / (f(r) * f(n-r))
 
-def perm(n, x):
-    """ Compute the permutation of n and c (i.e. the number of ways of choose r objects from a set of n
-    objects where order is important). """
+def perm(n, r):
+    """ Return the permutation of n and r (i.e. the number of ways for positioning r cards within a total of
+    n cards (where order does matter)). """
     f = math.factorial
-    return Decimal(f(n) / f(n-x))
+    return f(n) / f(n-r)
 
 def round_to(n, precision=0.005):
-    """ Rounds a given number to the nearest 'precision' """
+    """ Return a given number n rounded to the nearest 'precision' """
     correction = 0.5 if n >= 0 else -0.5 # so int (i.e. floor rounds to correct)
-    return int( n/Decimal(precision)+Decimal(correction) ) * precision
+    return int( n / Decimal(precision) + Decimal(correction) ) * precision
 
 
 def prob_win(N, X, rX, rY1, rY2, rY3):
-    """ Let X\in{H, C, D, S} be the horse to win and Y1,Y2,Y3\in{H, C, D, S}\{X} be the losing horses.
-    This function returns the probability that horse X wins the race. 
-    N:='number remaining cards (i.e. 42 in usual play)', rX:='number remaining cards for suit to win',
+    """ Let X be in {H,C,D,S} be the horse to win and Y1,Y2,Y3 be in {H,C,D,S}\{X} be the losing horses.
+    Return the probability that horse X wins the race.
+    N:='number remaining cards (i.e. 42 in usual play)', rX:='number remaining cards for winning suit',
     rY1:='number remaining cards of first suit not to win', rY2:='number remaining cards of second suit
     not to win', rY3:='number remaining cards of third suit not to win'
     """   
-    nX = 6 #number of X flipped during race (for X to win)
-    sum_pX = 0 # probability of X winning (summing over all possible winning arrangements)
+    nX = 6     # number of X flipped during race (for X to win)
+    sum_probX = 0 # initial the sum representing the overall probability for X winning
 
-    nY1 = 0 # number of Y1 observed during the race
+    nY1 = 0    # number of Y1 flipped during the race (must be less than 6)
     while nY1 < 6:
         nY2 = 0
         while nY2 < 6:
             nY3 = 0
             while nY3 < 6:
-                nFlip = nX+nY1+nY2+nY3 #number of cards flipped
-                nPos = nFlip-1 # number of possible positions for 5 X, nY1 Y1, nY2 Y2 and nY3 Y3 (noting that that last card must be X for X to win)
-                nWays = choose(nPos,5)*choose(nPos-5,nY1)*choose(nPos-5-nY1,nY2)*choose(nPos-5-nY1-nY2,nY3) # number of ways of selecting the 5 X, nY1 Y1, nY2 Y2 and nY3 Y3
-#                print "nWays of choosing nX="+str(nX)+", nY1="+str(nY1)+", nY2="+str(nY2)+", nY3="+str(nY3)+" is: "+str(nWays)
-                pCards = (perm(rX,nX)*perm(rY1,nY1)*perm(rY2,nY2)*perm(rY3,nY3))/perm(N,nFlip) # probability of observing nX X, nY1 Y1, nY2 Y2 and nY3 Y3
-#                print "pCards is: "+str(pCards)
+                nFlip = nX+nY1+nY2+nY3 # total number of cards flipped
+                nPos = nFlip-1         # total number of available positions for flipped cards (-1, noting that that last card must be X for X to win)
+
+                # number of sequences for a combination of 5 X, nY1 Y1, nY2 Y2 and nY3 Y3
+                nWays = comb(nPos,5) * comb(nPos-5,nY1) * comb(nPos-5-nY1,nY2) * comb(nPos-5-nY1-nY2,nY3)
+#                print "Number of ways for choosing nX={0}, nY1={1}, nY2={2}, nY3={3} is: {4}".format(nX,nY1,nY2,nY3,nWays)
+
+                # probability of observing nX X, nY1 Y1, nY2 Y2 and nY3 Y3 (any order)
+                prob_cards = Decimal( perm(rX,nX) * perm(rY1,nY1) * perm(rY2,nY2) * perm(rY3,nY3) ) / Decimal( perm(N,nFlip) )
+#                print "prob_cards is: {0}".format(prob_cards)
           
-                pX = nWays*pCards # probability of X win for this possible arrangement of cards (compare with binomial random variables).
-                sum_pX += pX
+                # probability of X win given a combination of nX X, nY1 Y1, nY2 Y2 and nY3 Y3 (compare with binomial random variables)
+                probX = nWays * prob_cards
+
+                sum_probX += probX
 
                 nY3 += 1
             nY2 += 1
         nY1 += 1
 
-    return sum_pX
+    return sum_probX
 
 
 if __name__ == "__main__":
