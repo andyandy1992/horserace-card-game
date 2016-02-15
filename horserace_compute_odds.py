@@ -19,19 +19,13 @@ def perm(n, r):
     f = math.factorial
     return f(n) / f(n-r)
 
-def round_to(n, precision=0.005):
-    """ Return a given number n rounded to the nearest 'precision' """
-    correction = 0.5 if n >= 0 else -0.5 # so int (i.e. floor rounds to correct)
-    return int( n / Decimal(precision) + Decimal(correction) ) * precision
-
-
 def prob_win(N, X, rX, rY1, rY2, rY3):
     """ Let X be in {H,C,D,S} be the horse to win and Y1,Y2,Y3 be in {H,C,D,S}\{X} be the losing horses.
     Return the probability that horse X wins the race.
     N:='number remaining cards (i.e. 42 in usual play)', rX:='number remaining cards for winning suit',
     rY1:='number remaining cards of first suit not to win', rY2:='number remaining cards of second suit
-    not to win', rY3:='number remaining cards of third suit not to win'
-    """   
+    not to win', rY3:='number remaining cards of third suit not to win' """
+
     nX = 6     # number of X flipped during race (for X to win)
     sum_probX = 0 # initial the sum representing the overall probability for X winning
 
@@ -63,56 +57,79 @@ def prob_win(N, X, rX, rY1, rY2, rY3):
 
     return sum_probX
 
+def pretty_prob(p):
+    """ Return a fraction with a 'more sensible' denominator (to eventually create 'more sensible' odds) """
+    # Initially try return a lower precision probability (but enventually a 'more sensible/bookie-like' odd)
+    pretty_prob = Fraction(round_to(p)).limit_denominator()
+
+    # If not precise enough, improve precision to prevent nonsense odds
+    if pretty_prob == 0:
+        pretty_prob = Fraction(round_to(p, precision=0.005)).limit_denominator()
+    
+    return pretty_prob
+
+def round_to(p, precision=0.05):
+    """ Return a given number p rounded to the nearest 'precision' """
+    correction = 0.5 if p >= 0 else -0.5 # so int (i.e. floor rounds to correct)
+    return int( Decimal(p) / Decimal(precision) + Decimal(correction) ) * precision
+
+def prob2odds(p):
+    """ Return the odds for a given probability p """
+    # Note: in the case of the usual game, we do not have to handle impossible events (e.g if a horse cannot win), and so this equation will never result in
+    #       divion by zero.
+    return (1-p) / p
+
 
 if __name__ == "__main__":
-    #Let H:="Heart card(s)", C:="Club card(s)", D:="Diamond card(s)", S:="Spade card(s)"
+    # Let H:="Heart card(s)", C:="Club card(s)", D:="Diamond card(s)", S:="Spade card(s)"
+    args_error = "\nERROR: 4 integer arguments required: oH oC oD oS [which denote the 'number of observed H, C, D, S respectively in the race track']"
     if len(sys.argv) != 5:
-        print "ERROR: 4 arguments required: oH oC oD oS [which denote the 'number of observed H, C, D, S respectively at the start of the race']"
+        print args_error
         exit(1)
 
-    oH = int(sys.argv[1]) # number of H observed at start (i.e. in the racetrack)
-    oC = int(sys.argv[2])
-    oD = int(sys.argv[3])
-    oS = int(sys.argv[4])
+    try:
+        oH = int(sys.argv[1]) # number of H observed at start (i.e. in the race track)
+        oC = int(sys.argv[2])
+        oD = int(sys.argv[3])
+        oS = int(sys.argv[4])
+    except ValueError:
+        print args_error
+        exit(1)
 
     rH = 13-oH-1 # remaining number of H (-1 for the "Ace of Hearts" horse)
     rC = 13-oC-1
     rD = 13-oD-1
     rS = 13-oS-1
 
-    #Quick check: number of remaining cards at the start should be 42 (for usual setup)
+    # Quick check: number of remaining cards at the start should be 42 (for usual setup)
     N = rH+rC+rD+rS # number of remainng cards at the start
     if N != 42:
-        print "Number of remaining cards at the start does not equal 42. Were the number of observed cards for each suit entered corerectly?"
+        print "\nERROR: Number of remaining cards at the start does not equal 42. Were the number of observed cards in the race track for each suit entered correctly?"
         exit(1)
 
-    #Compute winning probability for each suit
+    # Compute winning probability for each suit
     pH = prob_win(N, "H", rH, rC, rD, rS)
     pC = prob_win(N, "C", rC, rH, rD, rS)
     pD = prob_win(N, "D", rD, rH, rC, rS)
     pS = prob_win(N, "S", rS, rH, rC, rD)
-    print "Exact winning probabilities: H="+str(pH)+", C="+str(pC)+", D="+str(pD)+", S="+str(pS)
+    print "(More precise) winning probabilities: H={0}, C={1}, D={2}, S={3}".format(pH,pC,pD,pS)
+
 	#Improve readability:
-    pretty_pH = Fraction(round_to(pH)).limit_denominator()
-    pretty_pC = Fraction(round_to(pC)).limit_denominator()
-    pretty_pD = Fraction(round_to(pD)).limit_denominator()
-    pretty_pS = Fraction(round_to(pS)).limit_denominator()
-    print "Winnings probabilities: H="+str(pretty_pH)+", C="+str(pretty_pC)+", D="+str(pretty_pD)+", S="+str(pretty_pS)
+    pretty_pH = pretty_prob(pH)
+    pretty_pC = pretty_prob(pC)
+    pretty_pD = pretty_prob(pD)
+    pretty_pS = pretty_prob(pS)
+    print "(Rounded) winnings probabilities: H={0}, C={1}, D={2}, S={3}".format(pretty_pH, pretty_pC, pretty_pD, pretty_pS)
     #Check probs sum to 1
     total_sum = pH+pC+pD+pS
     if 1-total_sum > 0.05:
-        print "ERROR: Probabilities didn't sum to 1. total_sum="+str(total_sum)
+        print "\nERROR: Probabilities didn't sum to 1. total_sum={0}".format(total_sum)
 
-    #Compute horse odds (formula from https://www.google.co.uk/search?q=convert+probabilities+to+odds&oq=convert+probabilities+to+&gs_l=serp.3.0.0i22i30l10.80129.87682.0.88889.18.17.0.0.0.0.109.1340.16j1.17.0....0...1c.1.64.serp..9.9.731.TNXR5ahlXlk)
-#    oddsH = (1-pH)/pH
-#    oddsC = (1-pC)/pC
-#    oddsD = {1-pD}/pD
-#    oddsS = (1-pS)/pS
-    pretty_oddsH = (1-pretty_pH)/pretty_pH
-    pretty_oddsC = (1-pretty_pC)/pretty_pC
-    pretty_oddsD = (1-pretty_pD)/pretty_pD
-    pretty_oddsS = (1-pretty_pS)/pretty_pS
+    # Compute horse odds
+    pretty_oddsH = prob2odds(pretty_pH)
+    pretty_oddsC = prob2odds(pretty_pC)
+    pretty_oddsD = prob2odds(pretty_pD)
+    pretty_oddsS = prob2odds(pretty_pS)
     
-    print "Winnning odds (e.g. 3/1:='3 to 1 against'='stake 1 to win 3'):"
-#    print "Exact: H="+str(oddsH)+", C="+str(oddsC)+", D="+str(oddsD)+", S="+str(oddsS)
-    print "H="+str(pretty_oddsH.numerator)+"/"+str(pretty_oddsH.denominator)+", C="+str(pretty_oddsC.numerator)+"/"+str(pretty_oddsC.denominator)+", D="+str(pretty_oddsD.numerator)+"/"+str(pretty_oddsD.denominator)+", S="+str(pretty_oddsS.numerator)+"/"+str(pretty_oddsS.denominator)
+    print "(Rounded) fair odds (where 3/1:='3 to 1 against'='stake 1 to win 3'):"
+    print "H={0}/{1}, C={2}/{3}, D={4}/{5}, S={6}/{7}".format(pretty_oddsH.numerator, pretty_oddsH.denominator, pretty_oddsC.numerator, pretty_oddsC.denominator, pretty_oddsD.numerator, pretty_oddsD.denominator, pretty_oddsS.numerator, pretty_oddsS.denominator)

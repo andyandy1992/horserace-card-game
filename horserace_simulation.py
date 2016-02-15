@@ -1,11 +1,10 @@
 #!/usr/bin/python
 
-#LIBRARIES:
 # Standard library
 import math
 import sys
 from decimal import *
-#Local application (see https://github.com/andyandy1992/Vose-Alias-Method)
+# Local application (see https://github.com/andyandy1992/Vose-Alias-Method)
 from vose_sampler import VoseAlias as VA
 
 
@@ -14,7 +13,7 @@ def simulate_game(oH, oC, oD, oS):
         Inputs: number of cards observed within the racetrack for each suit.
         Output: Letter referring to the winning suit. """
 
-    #Remaining number of cards for each suit
+    # Remaining number of cards for each suit
     r = {}
     r["H"] = 13-oH-1 # remaining number of H (-1 for the "Ace of Hearts" horse)
     r["C"] = 13-oC-1
@@ -22,7 +21,7 @@ def simulate_game(oH, oC, oD, oS):
     r["S"] = 13-oS-1
     N = r["H"]+r["C"]+r["D"]+r["S"] # total number of remaining cards in deck
 
-    #Initialise counts for the number of flipped cards for each suit
+    # Initialise counts for the number of flipped cards for each suit
     n = {}
     n["H"]=0
     n["C"]=0
@@ -30,7 +29,7 @@ def simulate_game(oH, oC, oD, oS):
     n["S"]=0
 
     while n["H"]<6 and n["C"]<6 and n["D"]<6 and n["S"]<6:
-        #Compute probability that each suit is flipped
+        # Compute probability that each suit is flipped
         pH = Decimal(r["H"])/Decimal(N)
         pC = Decimal(r["C"])/Decimal(N)
         pD = Decimal(r["D"])/Decimal(N)
@@ -47,12 +46,12 @@ def simulate_game(oH, oC, oD, oS):
         r[card] -= 1
         N -= 1
 
-    return card #the last chosen card is the winner
+    return card # the last chosen card is the winner
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
-        print "ERROR: 4 arguments required: oH oC oD oS [which denote the 'number of observed H, C, D, S respectively at the start of the race']"
+        print "\nERROR: 4 arguments required: oH oC oD oS [which denote the 'number of observed H, C, D, S respectively at the start of the race']"
         exit(1)
 
     oH = int(sys.argv[1]) # number of H observed at start (i.e. in the racetrack)
@@ -60,19 +59,19 @@ if __name__ == "__main__":
     oD = int(sys.argv[3])
     oS = int(sys.argv[4])
 
-    #Ensure only 6 cards given
+    # Ensure only 6 cards given
     if (oH+oC+oD+oS) != 6:
-        print "Number of remaining in racetrack does not equal 6."
+        print "\nERROR: Number of cards observed in racetrack does not equal 6."
         exit(1)
 
-    #Initialise counts for number of winnings simulations for each suit.
+    # Initialise counts for number of winnings simulations for each suit.
     wins = {}
     wins["H"]=0
     wins["C"]=0
     wins["D"]=0
     wins["S"]=0
 
-    #Run simulations
+    # Run simulations
     for i in range(1000):
         card = simulate_game(oH, oC, oD, oS)
         wins[card] += 1
