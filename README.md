@@ -1,4 +1,4 @@
-#Computing the odds for the horserace card game
+# Computing the odds for the horserace card game
 Python implementation for computing the odds in the horserace card game:
 
 ![Example of the horserace card game in progress](/images/horserace.jpeg?raw=true "Example of the horserace card game in progress")
@@ -7,9 +7,9 @@ Python implementation for computing the odds in the horserace card game:
 2. 6 cards face-up are laid ("race track") in a straight line perpendicular to the aces.
 3. The race proceeds by flipping the remaining deck, & the ace matching that suit advances one step until a winner reaches the finish line (card 6).
 
-Solution explained: [Quora](https://www.quora.com/What-are-the-odds-for-the-horserace-card-game)
+Solution explained: [Medium](https://medium.com/@asmith9992/what-are-the-odds-for-the-horse-race-card-game-939a67602d2e)
 
-##<a name="depends-on">Depends on:</a>
+## <a name="depends-on">Depends on:</a>
 - The Python Standard Library, https://docs.python.org/2/library/
 - Python versions 2.7 (tested on Python 2.7.11)
 
